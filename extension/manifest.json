@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Support-DKHP (Bridge Slot Checker)",
+  "version": "1.0.0",
+  "description": "Web UI talks to extension via postMessage; extension scans DKHP tab and returns results.",
+  "permissions": ["tabs"],
+  "host_permissions": ["https://dkhp.uit.edu.vn/*"],
+  "background": { "service_worker": "sw.js" },
+  "content_scripts": [
+    {
+      "matches": ["https://dkhp.uit.edu.vn/*"],
+      "js": ["main.js", "content-loader.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "http://127.0.0.1/*",
+        "http://localhost/*"
+        /* , "https://YOUR_USERNAME.github.io/YOUR_REPO/*" */
+      ],
+      "js": ["ui-bridge.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

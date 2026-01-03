@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Support-DKHP | Slot Checker</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <!-- animated background -->
+  <div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grid-noise"></div>
+  </div>
+
+  <main class="wrap">
+    <header class="hero">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">SD</div>
+        <div class="brandText">
+          <h1>Support-DKHP</h1>
+          <p class="sub">
+            Nhập mã lớp (mỗi dòng 1 mã) → bấm <b>Quét</b> (Không cần nhập mã lớp thực hành).
+          </p>
+        </div>
+      </div>
+
+      <div class="heroRight">
+        <div class="chips">
+          <span id="chipConn" class="chip">Bridge: …</span>
+          <span id="chipState" class="chip">Idle</span>
+          <span id="chipTime" class="chip mono">—</span>
+        </div>
+
+        <div class="heroActions">
+          <button id="btnTheme" class="btn ghost" title="Sáng/Tối">
+            <span class="ico">☀️</span><span class="ico">🌙</span>
+            <span class="txt">Theme</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section class="mainGrid">
+      <!-- LEFT: input + settings -->
+      <section class="card">
+        <div class="cardHead">
+          <div>
+            <h2>Danh sách mã lớp</h2>
+            <div class="tiny">Mỗi dòng 1 mã. Mở sẵn tab DKHP (đăng nhập) trước khi quét.</div>
+          </div>
+          <span id="pillCount" class="pill mono">0 lines</span>
+        </div>
+
+        <textarea id="codes" class="textarea mono" rows="12" placeholder="Ví dụ:
+CS112.Q21.1
+CS114.Q21.1
+CS116.Q21.1"></textarea>
+
+        <div class="row">
+          <button id="btnScan" class="btn primary glow">
+            <span class="btnIcon">⚡</span>
+            <span>Quét</span>
+          </button>
+          <button id="btnSave" class="btn ghost">
+            <span class="btnIcon">💾</span>
+            <span>Lưu</span>
+          </button>
+          <button id="btnClear" class="btn ghost danger">
+            <span class="btnIcon">🧹</span>
+            <span>Xóa</span>
+          </button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="settings">
+          <div class="setting">
+            <label class="label">Chế độ quét</label>
+            <div class="seg">
+              <button id="modeOnce" class="segBtn active">1 lần</button>
+              <button id="modeLoop" class="segBtn">Lặp</button>
+            </div>
+          </div>
+
+          <div class="setting">
+            <label class="label">Chu kỳ (khi Lặp)</label>
+            <select id="interval" class="select">
+              <option value="1500">1.5s</option>
+              <option value="2000" selected>2s</option>
+              <option value="3000">3s</option>
+              <option value="5000">5s</option>
+              <option value="8000">8s</option>
+              <option value="12000">12s</option>
+            </select>
+          </div>
+
+          <div class="setting">
+            <label class="label">Sắp xếp</label>
+            <select id="sort" class="select">
+              <option value="input" selected>Theo thứ tự nhập</option>
+              <option value="left_desc">Slot còn nhiều → ít</option>
+              <option value="left_asc">Slot còn ít → nhiều</option>
+              <option value="code_asc">Mã lớp A → Z</option>
+            </select>
+          </div>
+
+          <div class="setting">
+            <label class="label">Lọc</label>
+            <select id="filter" class="select">
+              <option value="all" selected>Tất cả</option>
+              <option value="has">Còn slot (&gt; 0)</option>
+              <option value="full">Hết slot (= 0)</option>
+              <option value="unknown">Không rõ (null)</option>
+            </select>
+          </div>
+
+          <div class="setting">
+            <label class="label">Tìm nhanh</label>
+            <input id="q" class="input mono" placeholder="VD: CS112 hoặc Q21.1" />
+          </div>
+
+          <div class="setting">
+            <label class="label">Tiện ích</label>
+            <div class="row2">
+              <button id="btnCsv" class="btn ghost">
+                <span class="btnIcon">📄</span><span>CSV</span>
+              </button>
+              <button id="btnCopy" class="btn ghost">
+                <span class="btnIcon">📋</span><span>Copy</span>
+              </button>
+              <button id="btnPing" class="btn ghost">
+                <span class="btnIcon">🛰️</span><span>Ping</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="hint">
+          <b>Mẹo:</b> Nếu “Bridge: OFF”, hãy reload extension + reload trang web UI.  
+          Nếu scan báo “Chưa mở tab DKHP”, hãy mở DKHP trong cùng cửa sổ Chrome.
+        </div>
+      </section>
+
+      <!-- RIGHT: stats + results + log -->
+      <section class="stack">
+        <section class="card stats">
+          <div class="stat">
+            <div class="statLabel">Đang theo dõi</div>
+            <div id="stWatch" class="statVal mono">0</div>
+          </div>
+          <div class="stat">
+            <div class="statLabel">Tìm thấy</div>
+            <div id="stFound" class="statVal mono">0</div>
+          </div>
+          <div class="stat">
+            <div class="statLabel">Còn slot</div>
+            <div id="stHas" class="statVal mono">0</div>
+          </div>
+          <div class="stat">
+            <div class="statLabel">Best left</div>
+            <div id="stBest" class="statVal mono">—</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="cardHead">
+            <div>
+              <h2>Kết quả</h2>
+              <div class="tiny">Web sẽ hiển thị theo filter/sort/search bạn chọn.</div>
+            </div>
+            <span id="pillRows" class="pill mono">0 rows</span>
+          </div>
+
+          <div class="tableWrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Mã lớp</th>
+                  <th>Còn</th>
+                  <th>Đã ĐK</th>
+                  <th>Tối đa</th>
+                  <th>Raw</th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr><td colspan="5" class="muted">Chưa có dữ liệu.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <details class="raw">
+            <summary>JSON thô</summary>
+            <pre id="raw">—</pre>
+          </details>
+        </section>
+
+        <section class="card">
+          <div class="cardHead">
+            <div>
+              <h2>Log</h2>
+              <div class="tiny">Mỗi lần quét sẽ ghi 1 dòng (để debug nhanh).</div>
+            </div>
+            <button id="btnClearLog" class="btn ghost danger small">Xóa log</button>
+          </div>
+          <div id="log" class="log mono"></div>
+        </section>
+      </section>
+    </section>
+
+    <footer class="foot">
+      <span class="muted">Client-only web + MV3 bridge</span>
+    </footer>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
